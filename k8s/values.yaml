@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: catalog-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  port: 8080
+
+postgres:
+  host: postgres
+  port: "5432"
+  database: fiap_games
+  username: catalog_role
+  searchPath: catalog
+
+quotation:
+  frankfurterBaseUrl: https://api.frankfurter.dev
+  exchangeRateApiBaseUrl: https://open.er-api.com
+  cacheTtlMinutes: "60"

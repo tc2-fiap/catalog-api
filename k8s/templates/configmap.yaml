@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-api-config
+  namespace: {{ .Values.global.namespace }}
+data:
+  POSTGRES_HOST: {{ .Values.postgres.host | quote }}
+  POSTGRES_PORT: {{ .Values.postgres.port | quote }}
+  POSTGRES_DATABASE: {{ .Values.postgres.database | quote }}
+  POSTGRES_USERNAME: {{ .Values.postgres.username | quote }}
+  POSTGRES_SEARCHPATH: {{ .Values.postgres.searchPath | quote }}
+  QUOTATION_FRANKFURTER_BASE_URL: {{ .Values.quotation.frankfurterBaseUrl | quote }}
+  QUOTATION_EXCHANGERATE_BASE_URL: {{ .Values.quotation.exchangeRateApiBaseUrl | quote }}
+  QUOTATION_CACHE_TTL_MINUTES: {{ .Values.quotation.cacheTtlMinutes | quote }}
