@@ -127,7 +127,10 @@ using (var scope = app.Services.CreateScope())
                 "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg"),
             new("Cyberpunk 2077", "Action RPG", "Xbox", 199.90m, new DateOnly(2020, 12, 10),
                 "An open-world action RPG set in the dystopian metropolis of Night City.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg")
+                "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"),
+            new("Grand Theft Auto VI", "Action-Adventure", "PS5", 349.90m, new DateOnly(2026, 11, 19),
+                "An open-world action-adventure set across Leonida, including a fictionalized Miami.",
+                "https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Grand_Theft_Auto_VI.png/500px-Grand_Theft_Auto_VI.png")
         ];
 
         foreach (var game in seedGames)
