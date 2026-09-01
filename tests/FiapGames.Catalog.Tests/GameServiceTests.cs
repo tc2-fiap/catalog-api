@@ -81,4 +81,18 @@ public class GameServiceTests
         Assert.Single(result.Items);
         Assert.Equal(game.Title, result.Items.First().Title);
     }
+
+    [Fact]
+    public async Task SearchAsync_ForwardsFiltersToRepositoryAndMapsResults()
+    {
+        var game = new Game("Hollow Knight", "Metroidvania", "PC", 14.99m, new DateOnly(2017, 2, 24));
+        _repository.SearchPagedAsync(Arg.Any<PagedRequest>(), "Hollow", "Metroidvania", "PC", 10m, 20m, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<Game>([game], 1, 1, 10));
+
+        var result = await _sut.SearchAsync(new PagedRequest { Page = 1, PageSize = 10 }, "Hollow", "Metroidvania", "PC", 10m, 20m);
+
+        Assert.Single(result.Items);
+        Assert.Equal(game.Title, result.Items.First().Title);
+        await _repository.Received(1).SearchPagedAsync(Arg.Any<PagedRequest>(), "Hollow", "Metroidvania", "PC", 10m, 20m, Arg.Any<CancellationToken>());
+    }
 }

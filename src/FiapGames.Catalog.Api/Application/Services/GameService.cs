@@ -49,6 +49,20 @@ public sealed class GameService : IGameService
         return new PagedResult<GameResponse>(items, paged.TotalCount, paged.Page, paged.PageSize);
     }
 
+    public async Task<PagedResult<GameResponse>> SearchAsync(
+        PagedRequest request,
+        string? title,
+        string? genre,
+        string? platform,
+        decimal? minPrice,
+        decimal? maxPrice,
+        CancellationToken cancellationToken = default)
+    {
+        var paged = await _repository.SearchPagedAsync(request, title, genre, platform, minPrice, maxPrice, cancellationToken);
+        var items = paged.Items.Select(GameResponse.FromDomain).ToList();
+        return new PagedResult<GameResponse>(items, paged.TotalCount, paged.Page, paged.PageSize);
+    }
+
     public async Task<Result<GameResponse>> UpdateAsync(Guid id, UpdateGameRequest request, CancellationToken cancellationToken = default)
     {
         var game = await _repository.GetByIdAsync(id, cancellationToken);

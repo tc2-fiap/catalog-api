@@ -12,6 +12,15 @@ public interface IGameService
 
     Task<PagedResult<GameResponse>> GetPagedAsync(PagedRequest request, CancellationToken cancellationToken = default);
 
+    Task<PagedResult<GameResponse>> SearchAsync(
+        PagedRequest request,
+        string? title,
+        string? genre,
+        string? platform,
+        decimal? minPrice,
+        decimal? maxPrice,
+        CancellationToken cancellationToken = default);
+
     Task<Result<GameResponse>> UpdateAsync(Guid id, UpdateGameRequest request, CancellationToken cancellationToken = default);
 
     Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default);

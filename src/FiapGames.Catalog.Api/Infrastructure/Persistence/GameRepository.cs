@@ -27,6 +27,36 @@ public sealed class GameRepository : IGameRepository
         return new PagedResult<Game>(items, totalCount, request.Page ?? 1, request.PageSize ?? 10);
     }
 
+    public async Task<PagedResult<Game>> SearchPagedAsync(
+        PagedRequest request,
+        string? title,
+        string? genre,
+        string? platform,
+        decimal? minPrice,
+        decimal? maxPrice,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Games.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(title))
+            query = query.Where(g => EF.Functions.ILike(g.Title, $"%{title}%"));
+        if (!string.IsNullOrWhiteSpace(genre))
+            query = query.Where(g => g.Genre == genre);
+        if (!string.IsNullOrWhiteSpace(platform))
+            query = query.Where(g => g.Platform == platform);
+        if (minPrice.HasValue)
+            query = query.Where(g => g.Price >= minPrice.Value);
+        if (maxPrice.HasValue)
+            query = query.Where(g => g.Price <= maxPrice.Value);
+
+        query = query.OrderBy(g => g.CreatedAtUtc);
+
+        var totalCount = await query.LongCountAsync(cancellationToken);
+        var items = await query.Skip(request.Skip).Take(request.PageSize ?? 10).ToListAsync(cancellationToken);
+
+        return new PagedResult<Game>(items, totalCount, request.Page ?? 1, request.PageSize ?? 10);
+    }
+
     public Task AddAsync(Game entity, CancellationToken cancellationToken = default)
     {
         _context.Games.Add(entity);

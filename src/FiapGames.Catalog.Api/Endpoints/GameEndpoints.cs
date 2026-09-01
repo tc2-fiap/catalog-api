@@ -32,9 +32,17 @@ public static class GameEndpoints
             return result.ToHttpResult();
         });
 
-        group.MapGet("/", async ([AsParameters] PagedRequest request, IGameService service, CancellationToken cancellationToken) =>
+        group.MapGet("/", async (
+            [AsParameters] PagedRequest request,
+            string? title,
+            string? genre,
+            string? platform,
+            decimal? minPrice,
+            decimal? maxPrice,
+            IGameService service,
+            CancellationToken cancellationToken) =>
         {
-            var result = await service.GetPagedAsync(request, cancellationToken);
+            var result = await service.SearchAsync(request, title, genre, platform, minPrice, maxPrice, cancellationToken);
             return Results.Ok(result);
         });
 
