@@ -13,5 +13,7 @@ public interface IGameRepository : IRepository<Game>
         string? platform,
         decimal? minPrice,
         decimal? maxPrice,
+        string? sortBy,
+        string? sortDir,
         CancellationToken cancellationToken = default);
 }

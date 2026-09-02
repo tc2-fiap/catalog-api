@@ -86,13 +86,24 @@ public class GameServiceTests
     public async Task SearchAsync_ForwardsFiltersToRepositoryAndMapsResults()
     {
         var game = new Game("Hollow Knight", "Metroidvania", "PC", 14.99m, new DateOnly(2017, 2, 24));
-        _repository.SearchPagedAsync(Arg.Any<PagedRequest>(), "Hollow", "Metroidvania", "PC", 10m, 20m, Arg.Any<CancellationToken>())
+        _repository.SearchPagedAsync(Arg.Any<PagedRequest>(), "Hollow", "Metroidvania", "PC", 10m, 20m, null, null, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<Game>([game], 1, 1, 10));
 
-        var result = await _sut.SearchAsync(new PagedRequest { Page = 1, PageSize = 10 }, "Hollow", "Metroidvania", "PC", 10m, 20m);
+        var result = await _sut.SearchAsync(new PagedRequest { Page = 1, PageSize = 10 }, "Hollow", "Metroidvania", "PC", 10m, 20m, null, null);
 
         Assert.Single(result.Items);
         Assert.Equal(game.Title, result.Items.First().Title);
-        await _repository.Received(1).SearchPagedAsync(Arg.Any<PagedRequest>(), "Hollow", "Metroidvania", "PC", 10m, 20m, Arg.Any<CancellationToken>());
+        await _repository.Received(1).SearchPagedAsync(Arg.Any<PagedRequest>(), "Hollow", "Metroidvania", "PC", 10m, 20m, null, null, Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task SearchAsync_ForwardsSortByAndSortDirToRepository()
+    {
+        _repository.SearchPagedAsync(Arg.Any<PagedRequest>(), null, null, null, null, null, "price", "desc", Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<Game>([], 0, 1, 10));
+
+        await _sut.SearchAsync(new PagedRequest(), null, null, null, null, null, "price", "desc");
+
+        await _repository.Received(1).SearchPagedAsync(Arg.Any<PagedRequest>(), null, null, null, null, null, "price", "desc", Arg.Any<CancellationToken>());
     }
 }

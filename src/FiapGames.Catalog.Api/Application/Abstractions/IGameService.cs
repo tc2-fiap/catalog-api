@@ -19,6 +19,8 @@ public interface IGameService
         string? platform,
         decimal? minPrice,
         decimal? maxPrice,
+        string? sortBy,
+        string? sortDir,
         CancellationToken cancellationToken = default);
 
     Task<Result<GameResponse>> UpdateAsync(Guid id, UpdateGameRequest request, CancellationToken cancellationToken = default);

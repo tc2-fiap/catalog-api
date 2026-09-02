@@ -24,7 +24,7 @@ public static class GameEndpoints
 
             var game = await service.CreateAsync(request, cancellationToken);
             return Results.Created($"/api/games/{game.Id}", game);
-        });
+        }).RequireAuthorization(p => p.RequireRole("Admin"));
 
         group.MapGet("/{id:guid}", async (Guid id, IGameService service, CancellationToken cancellationToken) =>
         {
@@ -39,10 +39,12 @@ public static class GameEndpoints
             string? platform,
             decimal? minPrice,
             decimal? maxPrice,
+            string? sortBy,
+            string? sortDir,
             IGameService service,
             CancellationToken cancellationToken) =>
         {
-            var result = await service.SearchAsync(request, title, genre, platform, minPrice, maxPrice, cancellationToken);
+            var result = await service.SearchAsync(request, title, genre, platform, minPrice, maxPrice, sortBy, sortDir, cancellationToken);
             return Results.Ok(result);
         });
 
@@ -59,13 +61,13 @@ public static class GameEndpoints
 
             var result = await service.UpdateAsync(id, request, cancellationToken);
             return result.ToHttpResult();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Admin"));
 
         group.MapDelete("/{id:guid}", async (Guid id, IGameService service, CancellationToken cancellationToken) =>
         {
             var result = await service.DeleteAsync(id, cancellationToken);
             return result.ToHttpResult();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Admin"));
 
         return endpoints;
     }

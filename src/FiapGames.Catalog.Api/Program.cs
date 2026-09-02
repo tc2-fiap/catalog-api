@@ -102,43 +102,13 @@ using (var scope = app.Services.CreateScope())
     if (!await db.Games.AnyAsync())
     {
         var repository = scope.ServiceProvider.GetRequiredService<IGameRepository>();
-        Game[] seedGames =
-        [
-            new("The Witcher 3: Wild Hunt", "RPG", "PC", 79.99m, new DateOnly(2015, 5, 18),
-                "An open-world RPG following monster hunter Geralt of Rivia.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/292030/header.jpg"),
-            new("Hollow Knight", "Metroidvania", "PC", 34.99m, new DateOnly(2017, 2, 24),
-                "A challenging 2D action-adventure through a vast ruined kingdom of insects.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/367520/header.jpg"),
-            new("Stardew Valley", "Simulation", "PC", 24.99m, new DateOnly(2016, 2, 26),
-                "Inherit your grandfather's old farm and start a new life in the countryside.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/413150/header.jpg"),
-            new("Portal 2", "Puzzle", "PC", 39.99m, new DateOnly(2011, 4, 19),
-                "A first-person puzzle-platformer built around a physics-bending portal gun.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/620/header.jpg"),
-            new("Celeste", "Platformer", "PC", 29.99m, new DateOnly(2018, 1, 25),
-                "A tightly-designed precision platformer about climbing a mountain.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/504230/header.jpg"),
-            new("Terraria", "Sandbox", "PC", 19.99m, new DateOnly(2011, 5, 16),
-                "A 2D sandbox adventure of building, exploration, and combat.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/105600/header.jpg"),
-            new("Elden Ring", "Action RPG", "PS5", 249.90m, new DateOnly(2022, 2, 25),
-                "An open-world action RPG set in the Lands Between.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg"),
-            new("Cyberpunk 2077", "Action RPG", "Xbox", 199.90m, new DateOnly(2020, 12, 10),
-                "An open-world action RPG set in the dystopian metropolis of Night City.",
-                "https://cdn.cloudflare.steamstatic.com/steam/apps/1091500/header.jpg"),
-            new("Grand Theft Auto VI", "Action-Adventure", "PS5", 349.90m, new DateOnly(2026, 11, 19),
-                "An open-world action-adventure set across Leonida, including a fictionalized Miami.",
-                "https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Grand_Theft_Auto_VI.png/500px-Grand_Theft_Auto_VI.png")
-        ];
 
-        foreach (var game in seedGames)
+        foreach (var game in GameSeedData.Games)
             await repository.AddAsync(game);
 
         await repository.SaveChangesAsync();
 
-        Log.Information("Seeded catalog with {Count} games", seedGames.Length);
+        Log.Information("Seeded catalog with {Count} games", GameSeedData.Games.Length);
     }
 }
 

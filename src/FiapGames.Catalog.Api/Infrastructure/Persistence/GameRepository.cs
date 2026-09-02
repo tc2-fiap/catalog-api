@@ -34,6 +34,8 @@ public sealed class GameRepository : IGameRepository
         string? platform,
         decimal? minPrice,
         decimal? maxPrice,
+        string? sortBy,
+        string? sortDir,
         CancellationToken cancellationToken = default)
     {
         var query = _context.Games.AsQueryable();
@@ -49,7 +51,15 @@ public sealed class GameRepository : IGameRepository
         if (maxPrice.HasValue)
             query = query.Where(g => g.Price <= maxPrice.Value);
 
-        query = query.OrderBy(g => g.CreatedAtUtc);
+        var descending = string.Equals(sortDir, "desc", StringComparison.OrdinalIgnoreCase);
+        query = sortBy?.ToLowerInvariant() switch
+        {
+            "price" => descending ? query.OrderByDescending(g => g.Price) : query.OrderBy(g => g.Price),
+            "platform" => descending ? query.OrderByDescending(g => g.Platform) : query.OrderBy(g => g.Platform),
+            "genre" => descending ? query.OrderByDescending(g => g.Genre) : query.OrderBy(g => g.Genre),
+            "title" => descending ? query.OrderByDescending(g => g.Title) : query.OrderBy(g => g.Title),
+            _ => descending ? query.OrderByDescending(g => g.CreatedAtUtc) : query.OrderBy(g => g.CreatedAtUtc),
+        };
 
         var totalCount = await query.LongCountAsync(cancellationToken);
         var items = await query.Skip(request.Skip).Take(request.PageSize ?? 10).ToListAsync(cancellationToken);

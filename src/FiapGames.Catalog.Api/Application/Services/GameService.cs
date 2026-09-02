@@ -56,9 +56,11 @@ public sealed class GameService : IGameService
         string? platform,
         decimal? minPrice,
         decimal? maxPrice,
+        string? sortBy,
+        string? sortDir,
         CancellationToken cancellationToken = default)
     {
-        var paged = await _repository.SearchPagedAsync(request, title, genre, platform, minPrice, maxPrice, cancellationToken);
+        var paged = await _repository.SearchPagedAsync(request, title, genre, platform, minPrice, maxPrice, sortBy, sortDir, cancellationToken);
         var items = paged.Items.Select(GameResponse.FromDomain).ToList();
         return new PagedResult<GameResponse>(items, paged.TotalCount, paged.Page, paged.PageSize);
     }
