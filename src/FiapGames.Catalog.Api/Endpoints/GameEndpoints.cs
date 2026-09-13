@@ -8,9 +8,9 @@ namespace FiapGames.Catalog.Api.Endpoints;
 
 public static class GameEndpoints
 {
-    public static IEndpointRouteBuilder MapGameEndpoints(this IEndpointRouteBuilder endpoints)
+    public static IEndpointRouteBuilder MapGameEndpoints(this IEndpointRouteBuilder endpoints, Func<IResult> getVersion)
     {
-        var group = endpoints.MapGroup("/api/games").WithTags("Games").RequireAuthorization();
+        var group = endpoints.MapGroup("/api/catalog").WithTags("Games").RequireAuthorization();
 
         group.MapPost("/", async (
             CreateGameRequest request,
@@ -23,7 +23,7 @@ public static class GameEndpoints
                 return Results.ValidationProblem(validation.ToDictionary());
 
             var game = await service.CreateAsync(request, cancellationToken);
-            return Results.Created($"/api/games/{game.Id}", game);
+            return Results.Created($"/api/catalog/{game.Id}", game);
         }).RequireAuthorization(p => p.RequireRole("Admin"));
 
         group.MapGet("/{id:guid}", async (Guid id, IGameService service, CancellationToken cancellationToken) =>
@@ -68,6 +68,11 @@ public static class GameEndpoints
             var result = await service.DeleteAsync(id, cancellationToken);
             return result.ToHttpResult();
         }).RequireAuthorization(p => p.RequireRole("Admin"));
+
+        // Admin-dashboard-facing twin of the bare /version (see Program.cs):
+        // same handler, reached via the Ingress like any other route in
+        // this group instead of only via kubectl port-forward, gated to Admin.
+        group.MapGet("/version", getVersion).RequireAuthorization(p => p.RequireRole("Admin"));
 
         return endpoints;
     }
