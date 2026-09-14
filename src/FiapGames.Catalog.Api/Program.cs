@@ -1,12 +1,14 @@
 using FiapGames.Catalog.Api.Application.Abstractions;
 using FiapGames.Catalog.Api.Application.Services;
 using FiapGames.Catalog.Api.Application.Validators;
+using FiapGames.Catalog.Api.Consumers;
 using FiapGames.Catalog.Api.Domain;
 using FiapGames.Catalog.Api.Endpoints;
 using FiapGames.Catalog.Api.Infrastructure.Http;
 using FiapGames.Catalog.Api.Infrastructure.Persistence;
 using FiapGames.Shared.Infrastructure.Extensions;
 using FluentValidation;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Serilog;
@@ -86,6 +88,37 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddHealthChecks();
+
+// catalog-api otherwise publishes no events and consumes none — see
+// notes.md 1 — this is the one exception, added purely to receive
+// TokenRevokedEvent so a revoked Admin token stops working against this
+// service's admin-only game-management endpoints too. Not a purchase-flow
+// event, so it doesn't reopen that decision.
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<TokenRevokedConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(
+            builder.Configuration["RabbitMq:Host"] ?? "localhost",
+            builder.Configuration["RabbitMq:VirtualHost"] ?? "/",
+            h =>
+            {
+                h.Username(builder.Configuration["RabbitMq:Username"] ?? "guest");
+                h.Password(builder.Configuration["RabbitMq:Password"] ?? "guest");
+            });
+
+        // Explicit, service-scoped endpoint name — see orders-api's
+        // Program.cs for why relying on MassTransit's default naming
+        // (which ignores the namespace) is unsafe once two services
+        // declare a same-named consumer class for the same event.
+        cfg.ReceiveEndpoint("catalog-api-token-revoked", e =>
+        {
+            e.ConfigureConsumer<TokenRevokedConsumer>(context);
+        });
+    });
+});
 
 var app = builder.Build();
 

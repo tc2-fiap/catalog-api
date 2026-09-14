@@ -60,4 +60,48 @@ public class CreateGameRequestValidatorTests
 
         Assert.False(result.IsValid);
     }
+
+    [Theory]
+    [InlineData("javascript:alert(1)")]
+    [InlineData("file:///etc/passwd")]
+    [InlineData("ftp://example.com/cover.png")]
+    public void Validate_WithNonHttpCoverImageUrlScheme_Fails(string url)
+    {
+        var request = new CreateGameRequest("Hollow Knight", "Metroidvania", "PC", 14.99m, new DateOnly(2017, 2, 24), "desc", CoverImageUrl: url);
+
+        var result = _validator.Validate(request);
+
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_WithPriceAboveUpperBound_Fails()
+    {
+        var request = new CreateGameRequest("Hollow Knight", "Metroidvania", "PC", 1_000_000m, new DateOnly(2017, 2, 24), "desc");
+
+        var result = _validator.Validate(request);
+
+        Assert.False(result.IsValid);
+    }
+
+    [Theory]
+    [InlineData(1969, 12, 31)]
+    public void Validate_WithReleaseDateTooOld_Fails(int year, int month, int day)
+    {
+        var request = new CreateGameRequest("Hollow Knight", "Metroidvania", "PC", 14.99m, new DateOnly(year, month, day), "desc");
+
+        var result = _validator.Validate(request);
+
+        Assert.False(result.IsValid);
+    }
+
+    [Fact]
+    public void Validate_WithReleaseDateTooFarInFuture_Fails()
+    {
+        var request = new CreateGameRequest("Hollow Knight", "Metroidvania", "PC", 14.99m, DateOnly.FromDateTime(DateTime.UtcNow.AddYears(10)), "desc");
+
+        var result = _validator.Validate(request);
+
+        Assert.False(result.IsValid);
+    }
 }

@@ -9,6 +9,8 @@ data:
   POSTGRES_DATABASE: {{ .Values.postgres.database | quote }}
   POSTGRES_USERNAME: {{ .Values.postgres.username | quote }}
   POSTGRES_SEARCHPATH: {{ .Values.postgres.searchPath | quote }}
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_VIRTUALHOST: "/"
   QUOTATION_FRANKFURTER_BASE_URL: {{ .Values.quotation.frankfurterBaseUrl | quote }}
   QUOTATION_EXCHANGERATE_BASE_URL: {{ .Values.quotation.exchangeRateApiBaseUrl | quote }}
   QUOTATION_CACHE_TTL_MINUTES: {{ .Values.quotation.cacheTtlMinutes | quote }}
