@@ -20,8 +20,8 @@ services:
 
   catalog-api:
     build:
-      context: ./src/FiapGames.Catalog.Api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: src/FiapGames.Catalog.Api/Dockerfile
     restart: unless-stopped
     ports:
       - "8083:8080"
